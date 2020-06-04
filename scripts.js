@@ -1,3 +1,10 @@
+// loader
+$(window).load(function() {
+  setInterval(function() {
+    $('.se-pre').fadeOut('slow');
+  }, 2000);
+});
+
 // render table
 function renderTable() {
   const contacts = JSON.parse(localStorage.getItem('contacts'));
@@ -20,7 +27,7 @@ function renderTable() {
     <button type="button" 
     onclick="deletItem(${contact.id})" class="btn btn-danger"><i
   class="fa fa-trash" aria-hidden="true"></i></button>
-<button type="button" onclick="toggleForm()" class="btn btn-primary"><i
+<button type="button" onclick="edit(${contact.id})" class="btn btn-primary"><i
   class="fa fa-pencil-square" aria-hidden="true"></i></button> </td>`;
     return $('tbody').append(tr);
   });
@@ -28,15 +35,26 @@ function renderTable() {
 
 // show form
 function showForm() {
+  $('.btn-outline-info').on('click', function() {
+    $('input').val('');
+  });
   $('#form').css('width', '20%');
   $('#form').css('visibility', 'visible');
   $('#form').css('padding', '0 20px');
+  $('.btn-outline-info').addClass('animate__animated animate__fadeOutLeft');
+  $('.btn-outline-dark').css('visibility', 'visible');
+  $('.btn-outline-dark').addClass('animate__animated animate__fadeInRight');
+  $('.btn-outline-dark').removeClass('animate__fadeOutRight');
 }
 // hide form
 function hideForm() {
   $('#form').css('width', '0px');
   $('#form').css('visibility', 'hidden');
   $('#form').css('padding', '0');
+  $('.btn-outline-info').removeClass('animate__fadeOutLeft');
+  $('.btn-outline-info').addClass('animate__fadeInLeft');
+  $('.btn-outline-dark').removeClass('animate__fadeInRight');
+  $('.btn-outline-dark').addClass('animate__fadeOutRight');
 }
 // toggle form
 function toggleForm() {
@@ -47,14 +65,18 @@ function toggleForm() {
     hideForm();
   }
 }
+
 // on load data
 $(document).ready(function() {
   // on submit
   $('#form_contact').on('submit', function(event) {
     event.preventDefault();
-    const contacts = JSON.parse(localStorage.getItem('contacts'));
+    //
+    let contacts = JSON.parse(localStorage.getItem('contacts'));
     const newContactData = new FormData(event.target).entries();
     const newContact = Object.fromEntries(newContactData);
+    const editContact = contacts.find(item => item.id == newContact.id);
+    //
     if (newContact.id === '') {
       Swal.fire({
         icon: 'error',
@@ -62,14 +84,25 @@ $(document).ready(function() {
       });
       return;
     }
-    contacts.push(newContact);
+    //
+    if (editContact) {
+      contacts = contacts.map(item =>
+        item.id == newContact.id ? newContact : item
+      );
+    } else {
+      contacts.push(newContact);
+    }
+    //
     localStorage.setItem('contacts', JSON.stringify(contacts));
+    //
     $('tbody').html('');
     renderTable();
     hideForm();
+    event.target.reset();
   });
   renderTable();
 });
+
 // delete item
 function deleteContact(id) {
   let contacts = JSON.parse(localStorage.getItem('contacts'));
@@ -93,4 +126,19 @@ function deletItem(id) {
       Swal.fire('Deleted!', 'Your file has been deleted.', 'success');
     }
   });
+}
+
+// edit
+function edit(id) {
+  const contacts = JSON.parse(localStorage.getItem('contacts'));
+  const editContact = contacts.find(item => item.id == id);
+  $('#id_id_number').val(editContact.id);
+  $('#id_name').val(editContact.name);
+  $('#id_last_name').val(editContact.surname);
+  $('#id_Phone_number').val(editContact.phoneNumber);
+  $('#id_email').val(editContact.email);
+  $('#id_address').val(editContact.address);
+  $('#id_birthday').val(editContact.birthday);
+  $('#id_details').val(editContact.details);
+  showForm();
 }
