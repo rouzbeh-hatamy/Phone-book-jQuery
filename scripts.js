@@ -23,7 +23,7 @@ function renderTable() {
     <td>${contact.address}</td>
     <td>${contact.birthday}</td>
     <td>${contact.details}</td>
-    <td> 
+    <td class="buttons"> 
     <button type="button" 
     onclick="deletItem(${contact.id})" class="btn btn-danger"><i
   class="fa fa-trash" aria-hidden="true"></i></button>
@@ -38,23 +38,25 @@ function showForm() {
   $('.btn-outline-info').on('click', function() {
     $('input').val('');
   });
-  $('#form').css('width', '20%');
-  $('#form').css('visibility', 'visible');
-  $('#form').css('padding', '0 20px');
+  $('#form').toggleClass('open');
+  $('table').toggleClass('form-open');
   $('.btn-outline-info').addClass('animate__animated animate__fadeOutLeft');
   $('.btn-outline-dark').css('visibility', 'visible');
   $('.btn-outline-dark').addClass('animate__animated animate__fadeInRight');
   $('.btn-outline-dark').removeClass('animate__fadeOutRight');
+  $('#action').css('display', 'none');
+  $('.buttons').css('display', 'none');
 }
 // hide form
 function hideForm() {
-  $('#form').css('width', '0px');
-  $('#form').css('visibility', 'hidden');
-  $('#form').css('padding', '0');
+  $('#form').toggleClass('open');
+  $('table').toggleClass('form-open');
   $('.btn-outline-info').removeClass('animate__fadeOutLeft');
   $('.btn-outline-info').addClass('animate__fadeInLeft');
   $('.btn-outline-dark').removeClass('animate__fadeInRight');
   $('.btn-outline-dark').addClass('animate__fadeOutRight');
+  $('#action').css('display', 'table-cell');
+  $('.buttons').css('display', 'block');
 }
 // toggle form
 function toggleForm() {
@@ -99,6 +101,12 @@ $(document).ready(function() {
     renderTable();
     hideForm();
     event.target.reset();
+  });
+  // clicked outside
+  $('.inner-table').on('click', function() {
+    if (!($('#form').css('width') === '0px')) {
+      hideForm();
+    }
   });
   renderTable();
 });
