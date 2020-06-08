@@ -108,6 +108,14 @@ $(document).ready(function() {
       hideForm();
     }
   });
+  // escape button
+  $(window).on('keydown', function(event) {
+    if (!($('#form').css('width') === '0px')) {
+      if (event.key === 'Escape') {
+        hideForm();
+      }
+    }
+  });
   renderTable();
 });
 
